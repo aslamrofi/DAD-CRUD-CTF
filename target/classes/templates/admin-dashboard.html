@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CRUD CTF - Admin Dashboard</title>
+</head>
+<body>
+<h1>Admin Dashboard - Challenge Management</h1>
+
+<h2>Add New Challenge</h2>
+<form th:action="@{/admin/add}" th:object="${newChallenge}" method="post">
+    <input type="text" th:field="*{title}" placeholder="Challenge Title" required />
+    <input type="text" th:field="*{category}" placeholder="Category (e.g. Pwn)" required />
+    <input type="text" th:field="*{description}" placeholder="Description" required />
+    <input type="text" th:field="*{flag}" placeholder="Flag format: CRUD{...}" required />
+    <input type="number" th:field="*{points}" placeholder="Points" required />
+    <button type="submit">Create Challenge</button>
+</form>
+
+<hr>
+
+<h2>Active Challenges</h2>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Points</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="challenge : ${challenges}">
+        <td th:text="${challenge.id}"></td>
+        <td th:text="${challenge.title}"></td>
+        <td th:text="${challenge.category}"></td>
+        <td th:text="${challenge.points}"></td>
+        <td>
+            <a th:href="@{/admin/delete/{id}(id=${challenge.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
