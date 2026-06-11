@@ -1,4 +1,4 @@
-package main.java.com.crudctf;
+package com.crudctf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
