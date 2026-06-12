@@ -354,12 +354,12 @@
 
                 <a class="file-link"
                    th:if="${challenge.fileName != null}"
-                   th:href="@{/download/{id}(id=${challenge.id})}">
+                   th:href="@{/player/download/{id}(id=${challenge.id})}">
                     [ DOWNLOAD TARGET FILE ]
                 </a>
 
                 <form th:if="${!#lists.contains(solvedChallengeIds, challenge.id)}"
-                      th:action="@{/challenge/submit}" method="post">
+                      th:action="@{/player/submit}" method="post">
                     <input type="hidden" name="challengeId" th:value="${challenge.id}" />
 
                     <label>Submit Flag:</label>
