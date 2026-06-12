@@ -26,6 +26,12 @@ public class PlayerController {
     @Autowired
     private SolveRepository solveRepository;
 
+    @Autowired
+    private com.crudctf.service.OpenAiService openAiService;
+
+    @Autowired
+    private com.crudctf.repository.AiRequestRepository aiRequestRepository;
+
     // READ: Show the dashboard and active challenges
     @GetMapping("/dashboard")
     public String playerDashboard(HttpSession session, Model model) {
@@ -65,7 +71,35 @@ public class PlayerController {
 
         return "player-solves";
     }
+    // NEW ROUTE: Ask the AI for a hint
+    @PostMapping("/ask-ai")
+    public String askAi(@RequestParam Long challengeId, HttpSession session, RedirectAttributes redirectAttributes) {
 
+        com.crudctf.model.User loggedInUser = (com.crudctf.model.User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) return "redirect:/login";
+
+        com.crudctf.model.Challenge challenge = challengeRepository.findById(challengeId).orElse(null);
+
+        if (challenge != null) {
+            // 1. Get the hint from OpenAI
+            String aiResponse = openAiService.generateHint(challenge.getTitle(), challenge.getDescription());
+            String promptContext = "Target: " + challenge.getTitle() + " | Intel: " + challenge.getDescription();
+
+            // 2. Log the request to your Oracle Database
+            com.crudctf.model.AiRequest log = new com.crudctf.model.AiRequest();
+            log.setTeamId(loggedInUser.getUsername());
+            log.setChallengeId(String.valueOf(challenge.getId()));
+            log.setPromptContext(promptContext);
+            log.setAiResponse(aiResponse);
+            aiRequestRepository.save(log);
+
+            // 3. Send the response back to the HTML page
+            redirectAttributes.addFlashAttribute("aiHint", aiResponse);
+            redirectAttributes.addFlashAttribute("aiHintChallengeId", challenge.getId());
+        }
+
+        return "redirect:/player/dashboard";
+    }
     @PostMapping("/submit")
     public String submitFlag(@RequestParam Long challengeId,
                              @RequestParam String flag,

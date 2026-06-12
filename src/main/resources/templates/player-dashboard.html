@@ -31,14 +31,24 @@
 
     <p th:text="${challenge.description}">Challenge Description goes here.</p>
 
-    <div th:if="${solvedChallengeIds.contains(challenge.id)}" style="color: limegreen; font-weight: bold;">
-        [✓] FLAG SECURED
+    <div th:if="${challenge.fileName != null}" style="margin-bottom: 15px;">
+        <strong>Attached File:</strong>
+        <a th:href="@{/player/download/{id}(id=${challenge.id})}"
+           style="background-color: #444; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
+            ⬇️ Download <span th:text="${challenge.fileName}">file.txt</span>
+        </a>
     </div>
 
-    <form th:unless="${solvedChallengeIds.contains(challenge.id)}" th:action="@{/player/submit}" method="post">
+    <div th:if="${aiHintChallengeId == challenge.id}" style="background-color: #1a1a1a; border-left: 4px solid #00ffcc; padding: 15px; margin-bottom: 15px; font-family: monospace;">
+        <strong style="color: #00ffcc;">[AI INTEL]:</strong>
+        <span th:text="${aiHint}" style="color: #e0e0e0; white-space: pre-wrap;">AI is typing...</span>
+    </div>
+
+    <form th:unless="${solvedChallengeIds.contains(challenge.id)}" th:action="@{/player/ask-ai}" method="post" style="margin-bottom: 10px;">
         <input type="hidden" name="challengeId" th:value="${challenge.id}" />
-        <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
-        <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
+        <button type="submit" style="background-color: #001a33; color: #00ffcc; border: 1px solid #00ffcc; padding: 5px 10px; cursor: pointer; font-family: monospace;">
+            🧠 Query AI Database
+        </button>
     </form>
 </div>
 </body>
