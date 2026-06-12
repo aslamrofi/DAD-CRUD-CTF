@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CRUD CTF - Register Team</title>
+</head>
+<body>
+<h2>Enlist Your Team</h2>
+
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+<form th:action="@{/register}" th:object="${user}" method="post">
+    <div>
+        <label>Team Name (Username):</label>
+        <input type="text" th:field="*{username}" required autofocus />
+    </div>
+    <br>
+    <div>
+        <label>Password:</label>
+        <input type="password" th:field="*{password}" required />
+    </div>
+    <br>
+    <button type="submit">Create Account</button>
+</form>
+
+<br>
+<a th:href="@{/login}">Already have an account? Initiate Connection here.</a>
+</body>
+</html>

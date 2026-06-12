@@ -11,6 +11,32 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class AuthController {
 
+    // Show the registration form
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new User());
+        return "register";
+    }
+
+    // Process the new registration
+    @PostMapping("/register")
+    public String processRegistration(@ModelAttribute User user, Model model) {
+        // Force all new sign-ups to be regular players
+        user.setRole("PLAYER");
+
+        try {
+            // Save the new team/hacker to the Oracle database
+            userRepository.save(user);
+
+            // Redirect them to the login page after successful registration
+            return "redirect:/login";
+        } catch (Exception e) {
+            // If the username already exists (because it's marked as UNIQUE in the model)
+            model.addAttribute("error", "That Team Name is already taken. Choose another.");
+            return "register";
+        }
+    }
+
     @Autowired
     private UserRepository userRepository;
 
