@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>CRUD CTF - Global Leaderboard</title>
+</head>
+<body>
+<h2>Global Leaderboard</h2>
+<a th:href="@{/login}">[ Return to Login ]</a>
+<hr>
+
+<table border="1" style="width: 50%; text-align: left;">
+  <thead>
+  <tr>
+    <th>Rank</th>
+    <th>Team Name</th>
+    <th>Total Points</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="entry, iterStat : ${scoreboard}">
+    <td th:text="${iterStat.count}">1</td>
+    <td th:text="${entry.key}" style="font-weight: bold;">Team Name</td>
+    <td th:text="${entry.value}">0</td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

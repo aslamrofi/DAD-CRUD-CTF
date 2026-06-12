@@ -1,6 +1,7 @@
 package com.crudctf.controller;
 
 import com.crudctf.model.Challenge;
+import com.crudctf.model.Solve;
 import com.crudctf.model.User;
 import com.crudctf.repository.ChallengeRepository;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.crudctf.repository.SolveRepository;
 
 import java.util.Optional;
 
@@ -18,6 +20,9 @@ public class PlayerController {
 
     @Autowired
     private ChallengeRepository challengeRepository;
+
+    @Autowired
+    private SolveRepository solveRepository;
 
     // READ: Show the dashboard and active challenges
     @GetMapping("/dashboard")
@@ -35,7 +40,6 @@ public class PlayerController {
         return "player-dashboard";
     }
 
-    // CREATE (Gameplay): Handle flag submissions
     @PostMapping("/submit")
     public String submitFlag(@RequestParam Long challengeId,
                              @RequestParam String flag,
@@ -45,17 +49,26 @@ public class PlayerController {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) return "redirect:/login";
 
-        Optional<Challenge> optionalChallenge = challengeRepository.findById(challengeId);
+        // ANTI-CHEAT: Check if the team already solved this challenge
 
-        if (optionalChallenge.isPresent()) {
-            Challenge challenge = optionalChallenge.get();
+        if (solveRepository.existsByUserIdAndChallengeId(loggedInUser.getUserId(), challengeId)) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Access Denied: Your team already secured this flag.");
+            return "redirect:/player/dashboard";
+        }
 
-            // Check if the submitted flag matches the database flag
+        Challenge challenge = challengeRepository.findById(challengeId).orElse(null);
+
+        if (challenge != null) {
             if (challenge.getFlag().equals(flag)) {
+
+                // SAVE THE SOLVE TO ORACLE
+                Solve newSolve = new Solve();
+                newSolve.setUserId(loggedInUser.getUserId());
+                newSolve.setChallengeId(challenge.getId());
+                solveRepository.save(newSolve);
+
                 redirectAttributes.addFlashAttribute("successMsg",
                         "Flag Correct! " + challenge.getPoints() + " points secured for " + challenge.getTitle() + "!");
-
-                // TODO for Wan Afiq: This is where you will save the success to the "Solves" table!
 
             } else {
                 redirectAttributes.addFlashAttribute("errorMsg",

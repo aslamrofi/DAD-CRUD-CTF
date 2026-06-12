@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CRUD CTF - Hacker Terminal</title>
+</head>
+<body>
+<h2>Welcome, <span th:text="${teamName}">Team</span></h2>
+<a th:href="@{/logout}">[ Disconnect ]</a>
+<hr>
+
+<div th:if="${successMsg}" th:text="${successMsg}" style="color: limegreen; font-weight: bold; margin-bottom: 15px;"></div>
+<div th:if="${errorMsg}" th:text="${errorMsg}" style="color: red; font-weight: bold; margin-bottom: 15px;"></div>
+
+<h3>Active Targets</h3>
+
+<div th:each="challenge : ${challenges}" style="border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;">
+    <h4 style="margin-top: 0;">
+        <span th:text="${challenge.title}">Challenge Title</span>
+        [<span th:text="${challenge.category}">Category</span>] -
+        <span th:text="${challenge.points}">0</span> pts
+    </h4>
+
+    <p th:text="${challenge.description}">Challenge Description goes here.</p>
+
+    <form th:action="@{/player/submit}" method="post">
+        <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+
+        <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
+        <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
+    </form>
+</div>
+
+</body>
+</html>
