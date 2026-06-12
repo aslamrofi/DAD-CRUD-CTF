@@ -10,6 +10,6 @@ public class HomeController {
     @GetMapping("/")
     public String redirectToDashboard() {
         // Automatically forwards them to your admin dashboard
-        return "redirect:/admin/dashboard";
+        return "redirect:/login";
     }
 }
