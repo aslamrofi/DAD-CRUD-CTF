@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CRUD CTF - My Solves</title>
+</head>
+<body>
+<h2><span th:text="${teamName}">Team</span>'s Completed Targets</h2>
+
+<a th:href="@{/player/dashboard}">[ Return to Dashboard ]</a>
+<hr>
+
+<p th:if="${#lists.isEmpty(solvedChallenges)}">No flags secured yet. Get back to hacking.</p>
+
+<ul th:unless="${#lists.isEmpty(solvedChallenges)}">
+    <li th:each="challenge : ${solvedChallenges}" style="margin-bottom: 10px;">
+        <strong style="color: limegreen;" th:text="${challenge.title}">Challenge Name</strong>
+        (<span th:text="${challenge.category}">Category</span>) -
+        <span th:text="${challenge.points}">Points</span> pts
+    </li>
+</ul>
+
+</body>
+</html>
