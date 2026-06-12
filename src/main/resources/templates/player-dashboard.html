@@ -103,6 +103,28 @@
             text-transform: uppercase;
         }
 
+        .alert-message {
+            padding: 13px 15px;
+            margin-bottom: 16px;
+            border: 1px solid #ff0000;
+            background-color: rgba(80, 0, 0, 0.55);
+            color: #ffffff;
+            font-weight: bold;
+            line-height: 1.5;
+            box-shadow: 0 0 12px rgba(255, 0, 0, 0.25), inset 0 0 10px rgba(255, 0, 0, 0.08);
+        }
+
+        .success-message {
+            border-color: #ff3333;
+            text-shadow: 0 0 6px rgba(255, 0, 0, 0.7);
+        }
+
+        .error-message {
+            border-color: #ff0000;
+            background-color: rgba(120, 0, 0, 0.65);
+            text-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
+        }
+
         .challenge-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -364,6 +386,18 @@
     <div class="panel">
         <h3>Available Targets</h3>
 
+        <div th:if="${successMsg}"
+             th:text="${successMsg}"
+             class="alert-message success-message">
+            Success message
+        </div>
+
+        <div th:if="${errorMsg}"
+             th:text="${errorMsg}"
+             class="alert-message error-message">
+            Error message
+        </div>
+
         <div class="status-line">
             &gt; Live challenge feed synchronized. Select a target and submit proof of compromise.
         </div>
@@ -373,7 +407,7 @@
                  th:each="challenge : ${challenges}"
                  th:classappend="${#lists.contains(solvedChallengeIds, challenge.id)} ? 'solved'">
 
-                <div class="challenge-title" th:text="${challenge.title}">Challenge Title</div>
+            <div class="challenge-title" th:text="${challenge.title}">Challenge Title</div>
 
                 <div class="challenge-meta">
                     <span class="badge" th:text="${challenge.category}">Category</span>
@@ -410,6 +444,7 @@
                         AI response appears here.
                     </div>
                 </div>
+
 
                 <form th:if="${!#lists.contains(solvedChallengeIds, challenge.id)}"
                       th:action="@{/player/submit}" method="post">
