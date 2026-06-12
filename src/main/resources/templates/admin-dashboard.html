@@ -1,45 +1,63 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>CRUD CTF - Admin Dashboard</title>
+    <title>CRUD CTF - Command Center</title>
 </head>
 <body>
-<h1>Admin Dashboard - Challenge Management</h1>
+<h2>Admin Command Center</h2>
+<a th:href="@{/logout}">[ Disconnect ]</a>
+<hr>
 
-<h2>Add New Challenge</h2>
-<form th:action="@{/admin/add}" th:object="${newChallenge}" method="post">
-    <input type="text" th:field="*{title}" placeholder="Challenge Title" required />
-    <input type="text" th:field="*{category}" placeholder="Category (e.g. Pwn)" required />
-    <input type="text" th:field="*{description}" placeholder="Description" required />
-    <input type="text" th:field="*{flag}" placeholder="Flag format: CRUD{...}" required />
-    <input type="number" th:field="*{points}" placeholder="Points" required />
-    <button type="submit">Create Challenge</button>
+<h3>Deploy New Target</h3>
+
+<form th:action="@{/admin/challenge/add}" method="post" enctype="multipart/form-data" style="max-width: 500px;">
+
+    <div style="margin-bottom: 10px;">
+        <label>Title:</label><br>
+        <input type="text" name="title" required style="width: 100%;" />
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label>Category (e.g., Forensics, Pwn, Crypto):</label><br>
+        <input type="text" name="category" required style="width: 100%;" />
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label>Description (Intel):</label><br>
+        <textarea name="description" required style="width: 100%; height: 80px;"></textarea>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label>Points:</label><br>
+        <input type="number" name="points" required style="width: 100%;" />
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label>Flag (e.g., CRUD{...}):</label><br>
+        <input type="text" name="flag" required style="width: 100%;" />
+    </div>
+
+    <div style="margin-bottom: 15px; padding: 10px; border: 1px dashed #00ffcc; background-color: #1a1a1a;">
+        <label style="color: #00ffcc; font-weight: bold;">Attach Target File (Optional):</label><br><br>
+        <input type="file" name="challengeFile" style="color: white;" />
+    </div>
+
+    <button type="submit" style="padding: 10px 20px; font-weight: bold; cursor: pointer;">Deploy Target</button>
 </form>
 
 <hr>
 
-<h2>Active Challenges</h2>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Category</th>
-        <th>Points</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="challenge : ${challenges}">
-        <td th:text="${challenge.id}"></td>
-        <td th:text="${challenge.title}"></td>
-        <td th:text="${challenge.category}"></td>
-        <td th:text="${challenge.points}"></td>
-        <td>
-            <a th:href="@{/admin/delete/{id}(id=${challenge.id})}">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<h3>Active Targets Deployed</h3>
+<ul>
+    <li th:each="challenge : ${challenges}" style="margin-bottom: 5px;">
+        <strong th:text="${challenge.title}">Title</strong> -
+        <span th:text="${challenge.points}">0</span> pts
+
+        <span th:if="${challenge.fileName != null}" style="color: limegreen;">
+                [📎 <span th:text="${challenge.fileName}">file</span>]
+            </span>
+    </li>
+</ul>
+
 </body>
 </html>
