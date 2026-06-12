@@ -137,4 +137,28 @@ public class PlayerController {
         }
         return "redirect:/player/dashboard";
     }
+
+    // NEW ROUTE: Securely download target files
+    @GetMapping("/download/{id}")
+    public org.springframework.http.ResponseEntity<byte[]> downloadFile(@PathVariable Long id, HttpSession session) {
+
+        // Security: Ensure only logged-in players can download payloads
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return org.springframework.http.ResponseEntity.status(403).build();
+        }
+
+        Challenge challenge = challengeRepository.findById(id).orElse(null);
+
+        // Check if the challenge exists and actually has a file attached in the database
+        if (challenge != null && challenge.getFileData() != null) {
+            return org.springframework.http.ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + challenge.getFileName() + "\"")
+                    .contentType(org.springframework.http.MediaType.parseMediaType(challenge.getFileType()))
+                    .body(challenge.getFileData());
+        }
+
+        return org.springframework.http.ResponseEntity.notFound().build();
+    }
+
 }
