@@ -12,4 +12,10 @@ public class HomeController {
         // Automatically forwards them to your admin dashboard
         return "redirect:/login";
     }
+
+    // Show the About/Lore page
+    @GetMapping("/about")
+    public String showAboutPage() {
+        return "about";
+    }
 }

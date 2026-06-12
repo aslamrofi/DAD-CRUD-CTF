@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CRUD CTF - About</title>
+</head>
+<body>
+<h2>About CRUD CTF</h2>
+
+<a th:href="@{/login}">[ Return to Login ]</a> |
+<a th:href="@{/leaderboard}">[ Global Leaderboard ]</a>
+<hr>
+
+<div style="max-width: 800px; line-height: 1.6;">
+    <h3>The Origins</h3>
+    <p>
+        Originally conceived as an underground digital proving ground hidden deep within the FSKTM network architecture, <strong>CRUD CTF</strong> has evolved into a premier technical and psychological gauntlet. We don't just test your ability to read code; we test how you respond when the system fights back.
+    </p>
+
+    <h3>The Philosophy</h3>
+    <p>
+        The internet is a house of cards held together by legacy code and blind trust. Here, you will learn to exploit both. Our challenges are designed around the core principles of data manipulation: <strong>C</strong>reate, <strong>R</strong>ead, <strong>U</strong>pdate, and <strong>D</strong>estroy.
+    </p>
+    <p>
+        Expect nothing to be as it seems. What looks like a simple forensic analysis might be a trap; what looks like a broken script might be a backdoor. Leave your assumptions at the login screen.
+    </p>
+
+    <h3>Rules of Engagement</h3>
+    <ul>
+        <li><strong>No Denial of Service (DoS):</strong> Do not attempt to take down the competition infrastructure. If you crash the server, you lose.</li>
+        <li><strong>Keep Flags Confidential:</strong> Sharing flags with competing teams will result in an immediate, unappealable ban from the network.</li>
+        <li><strong>Report Infrastructure Bugs:</strong> If you find a zero-day in our actual platform rather than a challenge, report it to the admins. You may be rewarded.</li>
+        <li><strong>Trust No One:</strong> Not your teammates, not the challenge descriptions, and especially not the system logs.</li>
+    </ul>
+
+    <hr>
+    <p style="color: #666; font-size: 0.9em;">
+        <em>System Architecture Maintained by the CRUD Administration Group.
+            <br>Any unauthorized access attempts will be logged and prosecuted.</em>
+    </p>
+</div>
+</body>
+</html>
