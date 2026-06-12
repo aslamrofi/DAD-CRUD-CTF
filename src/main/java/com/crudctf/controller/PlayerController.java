@@ -11,7 +11,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.crudctf.repository.SolveRepository;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 @Controller
@@ -27,17 +29,41 @@ public class PlayerController {
     // READ: Show the dashboard and active challenges
     @GetMapping("/dashboard")
     public String playerDashboard(HttpSession session, Model model) {
-        // Security check: Bounce them to login if they aren't authenticated
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
-        }
+        if (loggedInUser == null) return "redirect:/login";
 
-        // Pass the team name and all challenges to the HTML template
         model.addAttribute("teamName", loggedInUser.getUsername());
         model.addAttribute("challenges", challengeRepository.findAll());
 
+        // NEW LOGIC: Get a list of just the IDs for the challenges this team has solved
+        List<Solve> userSolves = solveRepository.findByUserId(loggedInUser.getUserId());
+        List<Long> solvedChallengeIds = userSolves.stream()
+                .map(Solve::getChallengeId)
+                .collect(Collectors.toList());
+
+        model.addAttribute("solvedChallengeIds", solvedChallengeIds);
+
         return "player-dashboard";
+    }
+
+    // NEW METHOD: The dedicated "My Solves" section
+    @GetMapping("/solves")
+    public String mySolves(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) return "redirect:/login";
+
+        List<Solve> userSolves = solveRepository.findByUserId(loggedInUser.getUserId());
+        List<Challenge> solvedChallenges = new ArrayList<>();
+
+        // Match the solves to the actual challenge details
+        for (Solve solve : userSolves) {
+            challengeRepository.findById(solve.getChallengeId()).ifPresent(solvedChallenges::add);
+        }
+
+        model.addAttribute("teamName", loggedInUser.getUsername());
+        model.addAttribute("solvedChallenges", solvedChallenges);
+
+        return "player-solves";
     }
 
     @PostMapping("/submit")

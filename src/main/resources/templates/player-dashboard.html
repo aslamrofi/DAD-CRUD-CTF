@@ -6,6 +6,7 @@
 <body>
 <h2>Welcome, <span th:text="${teamName}">Team</span></h2>
 
+<a th:href="@{/player/solves}">[ My Completed Targets ]</a> |
 <a th:href="@{/leaderboard}">[ Global Leaderboard ]</a> |
 <a th:href="@{/logout}">[ Disconnect ]</a>
 
@@ -16,7 +17,11 @@
 
 <h3>Active Targets</h3>
 
-<div th:each="challenge : ${challenges}" style="border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;">
+<div th:each="challenge : ${challenges}"
+     th:style="${solvedChallengeIds.contains(challenge.id)} ?
+                   'border: 2px solid limegreen; background-color: #f0fff0; margin-bottom: 15px; padding: 15px; max-width: 600px;' :
+                   'border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;'">
+
     <h4 style="margin-top: 0;">
         <span th:text="${challenge.title}">Challenge Title</span>
         [<span th:text="${challenge.category}">Category</span>] -
@@ -25,13 +30,15 @@
 
     <p th:text="${challenge.description}">Challenge Description goes here.</p>
 
-    <form th:action="@{/player/submit}" method="post">
-        <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+    <div th:if="${solvedChallengeIds.contains(challenge.id)}" style="color: limegreen; font-weight: bold;">
+        [✓] FLAG SECURED
+    </div>
 
+    <form th:unless="${solvedChallengeIds.contains(challenge.id)}" th:action="@{/player/submit}" method="post">
+        <input type="hidden" name="challengeId" th:value="${challenge.id}" />
         <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
         <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
     </form>
 </div>
-
 </body>
 </html>
