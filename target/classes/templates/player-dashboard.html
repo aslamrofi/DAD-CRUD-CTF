@@ -6,7 +6,9 @@
 <body>
 <h2>Welcome, <span th:text="${teamName}">Team</span></h2>
 
+<a th:href="@{/player/solves}">[ My Completed Targets ]</a> |
 <a th:href="@{/leaderboard}">[ Global Leaderboard ]</a> |
+<a th:href="@{/about}">What is CRUD CTF? Read the dossier.</a> |
 <a th:href="@{/logout}">[ Disconnect ]</a>
 
 <hr>
@@ -16,7 +18,11 @@
 
 <h3>Active Targets</h3>
 
-<div th:each="challenge : ${challenges}" style="border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;">
+<div th:each="challenge : ${challenges}"
+     th:style="${#lists.contains(solvedChallengeIds, challenge.id)} ?
+                       'border: 2px solid limegreen; background-color: #f0fff0; margin-bottom: 15px; padding: 15px; max-width: 600px;' :
+                       'border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;'">
+
     <h4 style="margin-top: 0;">
         <span th:text="${challenge.title}">Challenge Title</span>
         [<span th:text="${challenge.category}">Category</span>] -
@@ -25,13 +31,39 @@
 
     <p th:text="${challenge.description}">Challenge Description goes here.</p>
 
-    <form th:action="@{/player/submit}" method="post">
-        <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+    <div th:if="${challenge.fileName != null}" style="margin-bottom: 15px;">
+        <strong>Attached File:</strong>
+        <a th:href="@{/player/download/{id}(id=${challenge.id})}"
+           style="background-color: #444; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
+            ⬇️ Download <span th:text="${challenge.fileName}">file.txt</span>
+        </a>
+    </div>
 
-        <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
-        <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
-    </form>
+    <div th:if="${aiHintChallengeId != null and aiHintChallengeId == challenge.id}" style="background-color: #1a1a1a; border-left: 4px solid #00ffcc; padding: 15px; margin-bottom: 15px; font-family: monospace;">
+        <strong style="color: #00ffcc;">[AI INTEL]:</strong>
+        <span th:text="${aiHint}" style="color: #e0e0e0; white-space: pre-wrap;">AI is typing...</span>
+    </div>
+
+    <div th:if="${#lists.contains(solvedChallengeIds, challenge.id)}" style="color: limegreen; font-weight: bold;">
+        [✓] FLAG SECURED
+    </div>
+
+    <div th:unless="${#lists.contains(solvedChallengeIds, challenge.id)}">
+
+        <form th:action="@{/player/submit}" method="post" style="margin-bottom: 10px;">
+            <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+            <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
+            <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
+        </form>
+
+        <form th:action="@{/player/ask-ai}" method="post">
+            <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+            <button type="submit" style="background-color: #001a33; color: #00ffcc; border: 1px solid #00ffcc; padding: 5px 10px; cursor: pointer; font-family: monospace;">
+                🧠 Query AI Database
+            </button>
+        </form>
+
+    </div>
 </div>
-
 </body>
 </html>
