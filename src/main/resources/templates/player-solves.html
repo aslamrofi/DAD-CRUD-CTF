@@ -2,22 +2,276 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>CRUD CTF - My Solves</title>
+    <style>
+        body {
+            background-color: #050000;
+            color: #ff4d4d;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            margin: 0;
+            background-image: repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 0, 0, 0.03) 2px,
+                    rgba(255, 0, 0, 0.03) 4px
+            );
+        }
+
+        .terminal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 1px solid #cc0000;
+            box-shadow: 0 0 25px rgba(204, 0, 0, 0.25), inset 0 0 18px rgba(204, 0, 0, 0.12);
+            background-color: rgba(10, 0, 0, 0.92);
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .terminal-container::before {
+            content: "PLAYER.SOLVES.ARCHIVE // CONFIRMED BREACH LOG";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background-color: #050000;
+            color: #ff0000;
+            padding: 0 10px;
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            border-left: 1px solid #cc0000;
+            border-right: 1px solid #cc0000;
+        }
+
+        h2 {
+            color: #ff0000;
+            text-shadow: 0 0 8px #ff0000, 0 0 15px #aa0000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #330000;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h3 {
+            color: #ff3333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 35px;
+            border-left: 3px solid #ff0000;
+            padding-left: 10px;
+        }
+
+        .operator-name {
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .nav-links {
+            margin-bottom: 25px;
+            line-height: 2;
+        }
+
+        a {
+            color: #ff6666;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ffffff;
+            background-color: #aa0000;
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .panel {
+            border: 1px solid #660000;
+            background-color: rgba(20, 0, 0, 0.75);
+            box-shadow: inset 0 0 12px rgba(255, 0, 0, 0.08);
+            padding: 22px;
+            margin-top: 20px;
+        }
+
+        .status-line {
+            color: #990000;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+        }
+
+        .solves-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+
+        .solve-card {
+            border: 1px solid #550000;
+            background-color: rgba(15, 0, 0, 0.88);
+            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.06);
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .solve-card::before {
+            content: "SECURED";
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: rgba(255, 0, 0, 0.25);
+            font-size: 0.75em;
+            letter-spacing: 2px;
+        }
+
+        .solve-card:hover {
+            border-color: #ff0000;
+            box-shadow: 0 0 14px rgba(255, 0, 0, 0.28), inset 0 0 12px rgba(255, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .challenge-title {
+            color: #ff0000;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.45);
+            padding-right: 90px;
+        }
+
+        .challenge-meta {
+            margin-top: 10px;
+            color: #ff9999;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            display: inline-block;
+            border: 1px solid #990000;
+            background-color: rgba(80, 0, 0, 0.45);
+            color: #ffcccc;
+            padding: 4px 8px;
+            margin: 3px 4px 3px 0;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .points-badge {
+            color: #ffffff;
+            border-color: #ff0000;
+            background-color: rgba(170, 0, 0, 0.5);
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.25);
+        }
+
+        .empty-state {
+            color: #990000;
+            border: 1px dashed #660000;
+            padding: 18px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-color: rgba(10, 0, 0, 0.65);
+            margin-top: 20px;
+        }
+
+        .footer-warning {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px dashed #660000;
+            color: #990000;
+            font-size: 0.85em;
+            text-align: center;
+        }
+
+        .cursor {
+            animation: blink 1s step-end infinite;
+            color: #ff0000;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 20px;
+            }
+
+            .terminal-container {
+                padding: 25px 20px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            .terminal-container::before {
+                font-size: 0.65em;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2><span th:text="${teamName}">Team</span>'s Completed Targets</h2>
 
-<a th:href="@{/player/dashboard}">[ Return to Dashboard ]</a>
-<hr>
+<div class="terminal-container">
+    <h2>
+        <span class="operator-name" th:text="${teamName}">Team</span>'s Completed Targets
+        <span class="cursor">_</span>
+    </h2>
 
-<p th:if="${#lists.isEmpty(solvedChallenges)}">No flags secured yet. Get back to hacking.</p>
+    <div class="nav-links">
+        <a th:href="@{/player/dashboard}">[ RETURN TO DASHBOARD ]</a>
+        <span style="color: #660000;">//</span>
+        <a th:href="@{/leaderboard}">[ LEADERBOARD ]</a>
+        <span style="color: #660000;">//</span>
+        <a th:href="@{/about}">[ SYSTEM DOSSIER ]</a>
+    </div>
 
-<ul th:unless="${#lists.isEmpty(solvedChallenges)}">
-    <li th:each="challenge : ${solvedChallenges}" style="margin-bottom: 10px;">
-        <strong style="color: limegreen;" th:text="${challenge.title}">Challenge Name</strong>
-        (<span th:text="${challenge.category}">Category</span>) -
-        <span th:text="${challenge.points}">Points</span> pts
-    </li>
-</ul>
+    <div class="panel">
+        <h3>Confirmed Breach Archive</h3>
+
+        <div class="status-line">
+            &gt; Displaying secured flags and verified target completions.
+        </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(solvedChallenges)}">
+            No flags secured yet. Get back to hacking.
+        </div>
+
+        <ul class="solves-list" th:unless="${#lists.isEmpty(solvedChallenges)}">
+            <li class="solve-card" th:each="challenge : ${solvedChallenges}">
+                <div class="challenge-title" th:text="${challenge.title}">Challenge Name</div>
+
+                <div class="challenge-meta">
+                    <span class="badge" th:text="${challenge.category}">Category</span>
+                    <span class="badge points-badge">
+                        <span th:text="${challenge.points}">0</span> pts
+                    </span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="footer-warning">
+        WARNING: SOLVE HISTORY IS VERIFIED AGAINST CRUD CTF SECURITY ARCHIVES.<br>
+        FALSE CLAIMS, REPLAYED FLAGS, AND SCORE TAMPERING ARE MONITORED.
+    </div>
+</div>
 
 </body>
 </html>

@@ -2,27 +2,237 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>CRUD CTF - Login</title>
+    <style>
+        body {
+            background-color: #050000;
+            color: #ff4d4d;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background-image: repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 0, 0, 0.03) 2px,
+                    rgba(255, 0, 0, 0.03) 4px
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .terminal-container {
+            width: 100%;
+            max-width: 520px;
+            border: 1px solid #cc0000;
+            box-shadow: 0 0 25px rgba(204, 0, 0, 0.25), inset 0 0 18px rgba(204, 0, 0, 0.12);
+            background-color: rgba(10, 0, 0, 0.92);
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .terminal-container::before {
+            content: "AUTH.GATEWAY // SECURE HANDSHAKE REQUIRED";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background-color: #050000;
+            color: #ff0000;
+            padding: 0 10px;
+            font-size: 0.75em;
+            letter-spacing: 2px;
+            border-left: 1px solid #cc0000;
+            border-right: 1px solid #cc0000;
+        }
+
+        h2 {
+            color: #ff0000;
+            text-shadow: 0 0 8px #ff0000, 0 0 15px #aa0000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #330000;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .status-line {
+            color: #990000;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .error-message {
+            color: #ffffff;
+            background-color: rgba(120, 0, 0, 0.35);
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.25);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-row {
+            margin-bottom: 18px;
+        }
+
+        label {
+            color: #ff9999;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 8px;
+            background-color: #090000;
+            color: #ffcccc;
+            border: 1px solid #660000;
+            outline: none;
+            padding: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.35);
+            background-color: #120000;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #770000;
+            border: 1px solid #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.25);
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background-color: #aa0000;
+            box-shadow: 0 0 15px #ff0000;
+            transform: translateY(-1px);
+        }
+
+        .nav-links {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px dashed #660000;
+            font-weight: bold;
+            text-align: center;
+            line-height: 2;
+        }
+
+        a {
+            color: #ff6666;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: #ffffff;
+            background-color: #aa0000;
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .footer-warning {
+            margin-top: 28px;
+            color: #990000;
+            font-size: 0.8em;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cursor {
+            animation: blink 1s step-end infinite;
+            color: #ff0000;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px;
+            }
+
+            .terminal-container {
+                padding: 28px 22px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            .terminal-container::before {
+                font-size: 0.65em;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2>Terminal Access</h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+<div class="terminal-container">
+    <h2>Initiate Connection <span class="cursor">_</span></h2>
 
-<form th:action="@{/login}" method="post">
-    <div>
-        <label>Username (Team Name / Admin):</label>
-        <input type="text" name="username" required autofocus />
+    <div class="status-line">
+        &gt; Awaiting operator credentials...
     </div>
-    <br>
-    <div>
-        <label>Password:</label>
-        <input type="password" name="password" required />
+
+    <p th:if="${error}" th:text="${error}" class="error-message"></p>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-row">
+            <label>Team Name / Username:</label>
+            <input type="text" name="username" required autofocus />
+        </div>
+
+        <div class="form-row">
+            <label>Password:</label>
+            <input type="password" name="password" required />
+        </div>
+
+        <button type="submit">Authenticate</button>
+    </form>
+
+    <div class="nav-links">
+        <a th:href="@{/register}">[ ENLIST NEW TEAM ]</a>
+        <br>
+        <a th:href="@{/about}">[ SYSTEM DOSSIER ]</a>
+        <span style="color: #660000;">//</span>
+        <a th:href="@{/leaderboard}">[ LEADERBOARD ]</a>
     </div>
-    <br>
-    <button type="submit">Initiate Connection</button>
-</form>
-<br>
-<a th:href="@{/register}">Need to register a new team? Enlist here.</a>
-<a th:href="@{/about}">What is CRUD CTF? Read the dossier.</a>
+
+    <div class="footer-warning">
+        Unauthorized access attempts are logged and traced.
+    </div>
+</div>
+
 </body>
 </html>

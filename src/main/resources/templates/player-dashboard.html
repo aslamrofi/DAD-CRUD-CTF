@@ -1,69 +1,389 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>CRUD CTF - Hacker Terminal</title>
+    <title>CRUD CTF - Player Dashboard</title>
+    <style>
+        body {
+            background-color: #050000;
+            color: #ff4d4d;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            margin: 0;
+            background-image: repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 0, 0, 0.03) 2px,
+                    rgba(255, 0, 0, 0.03) 4px
+            );
+        }
+
+        .terminal-container {
+            max-width: 1050px;
+            margin: 0 auto;
+            border: 1px solid #cc0000;
+            box-shadow: 0 0 25px rgba(204, 0, 0, 0.25), inset 0 0 18px rgba(204, 0, 0, 0.12);
+            background-color: rgba(10, 0, 0, 0.92);
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .terminal-container::before {
+            content: "PLAYER.OPS.CONSOLE // LIVE CHALLENGE FEED";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background-color: #050000;
+            color: #ff0000;
+            padding: 0 10px;
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            border-left: 1px solid #cc0000;
+            border-right: 1px solid #cc0000;
+        }
+
+        h2 {
+            color: #ff0000;
+            text-shadow: 0 0 8px #ff0000, 0 0 15px #aa0000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #330000;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h3 {
+            color: #ff3333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 35px;
+            border-left: 3px solid #ff0000;
+            padding-left: 10px;
+        }
+
+        a {
+            color: #ff6666;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ffffff;
+            background-color: #aa0000;
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .nav-links {
+            margin-bottom: 25px;
+            line-height: 2;
+        }
+
+        .operator-name {
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .panel {
+            border: 1px solid #660000;
+            background-color: rgba(20, 0, 0, 0.75);
+            box-shadow: inset 0 0 12px rgba(255, 0, 0, 0.08);
+            padding: 22px;
+            margin-top: 20px;
+        }
+
+        .status-line {
+            color: #990000;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .challenge-card {
+            border: 1px solid #550000;
+            background-color: rgba(15, 0, 0, 0.88);
+            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.06);
+            padding: 18px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-card::before {
+            content: "TARGET";
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            color: rgba(255, 0, 0, 0.25);
+            font-size: 0.75em;
+            letter-spacing: 2px;
+        }
+
+        .challenge-card:hover {
+            border-color: #ff0000;
+            box-shadow: 0 0 14px rgba(255, 0, 0, 0.28), inset 0 0 12px rgba(255, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .challenge-card.solved {
+            border-color: #ff3333;
+            background-color: rgba(80, 0, 0, 0.35);
+        }
+
+        .challenge-card.solved::before {
+            content: "BREACHED";
+            color: rgba(255, 180, 180, 0.35);
+        }
+
+        .challenge-title {
+            color: #ff0000;
+            font-size: 1.15em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.45);
+            margin-bottom: 8px;
+            padding-right: 80px;
+        }
+
+        .challenge-meta {
+            color: #ff9999;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .challenge-description {
+            color: #ffcccc;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            border: 1px solid #990000;
+            background-color: rgba(80, 0, 0, 0.45);
+            color: #ffcccc;
+            padding: 4px 8px;
+            margin: 3px 4px 3px 0;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .solved-badge {
+            border-color: #ff0000;
+            background-color: rgba(170, 0, 0, 0.5);
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+        }
+
+        .file-link {
+            display: inline-block;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        form {
+            margin-top: 15px;
+            border-top: 1px dashed #550000;
+            padding-top: 15px;
+        }
+
+        label {
+            color: #ff9999;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85em;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            background-color: #090000;
+            color: #ffcccc;
+            border: 1px solid #660000;
+            outline: none;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.35);
+            background-color: #120000;
+        }
+
+        button {
+            width: 100%;
+            padding: 11px 18px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #770000;
+            border: 1px solid #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.25);
+        }
+
+        button:hover {
+            background-color: #aa0000;
+            box-shadow: 0 0 15px #ff0000;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            background-color: #330000;
+            border-color: #660000;
+            color: #990000;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .empty-state {
+            color: #990000;
+            border: 1px dashed #660000;
+            padding: 18px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-color: rgba(10, 0, 0, 0.65);
+        }
+
+        .footer-warning {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px dashed #660000;
+            color: #990000;
+            font-size: 0.85em;
+            text-align: center;
+        }
+
+        .cursor {
+            animation: blink 1s step-end infinite;
+            color: #ff0000;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 20px;
+            }
+
+            .terminal-container {
+                padding: 25px 20px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2>Welcome, <span th:text="${teamName}">Team</span></h2>
 
-<a th:href="@{/player/solves}">[ My Completed Targets ]</a> |
-<a th:href="@{/leaderboard}">[ Global Leaderboard ]</a> |
-<a th:href="@{/about}">What is CRUD CTF? Read the dossier.</a> |
-<a th:href="@{/logout}">[ Disconnect ]</a>
+<div class="terminal-container">
+    <h2>
+        Welcome, <span class="operator-name" th:text="${teamName}">Operator</span>
+        <span class="cursor">_</span>
+    </h2>
 
-<hr>
-
-<div th:if="${successMsg}" th:text="${successMsg}" style="color: limegreen; font-weight: bold; margin-bottom: 15px;"></div>
-<div th:if="${errorMsg}" th:text="${errorMsg}" style="color: red; font-weight: bold; margin-bottom: 15px;"></div>
-
-<h3>Active Targets</h3>
-
-<div th:each="challenge : ${challenges}"
-     th:style="${#lists.contains(solvedChallengeIds, challenge.id)} ?
-                       'border: 2px solid limegreen; background-color: #f0fff0; margin-bottom: 15px; padding: 15px; max-width: 600px;' :
-                       'border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;'">
-
-    <h4 style="margin-top: 0;">
-        <span th:text="${challenge.title}">Challenge Title</span>
-        [<span th:text="${challenge.category}">Category</span>] -
-        <span th:text="${challenge.points}">0</span> pts
-    </h4>
-
-    <p th:text="${challenge.description}">Challenge Description goes here.</p>
-
-    <div th:if="${challenge.fileName != null}" style="margin-bottom: 15px;">
-        <strong>Attached File:</strong>
-        <a th:href="@{/player/download/{id}(id=${challenge.id})}"
-           style="background-color: #444; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
-            ⬇️ Download <span th:text="${challenge.fileName}">file.txt</span>
-        </a>
+    <div class="nav-links">
+        <a th:href="@{/logout}">[ DISCONNECT ]</a>
+        <span style="color: #660000;">//</span>
+        <a th:href="@{/leaderboard}">[ LEADERBOARD ]</a>
+        <span style="color: #660000;">//</span>
+        <a th:href="@{/about}">[ SYSTEM DOSSIER ]</a>
     </div>
 
-    <div th:if="${aiHintChallengeId != null and aiHintChallengeId == challenge.id}" style="background-color: #1a1a1a; border-left: 4px solid #00ffcc; padding: 15px; margin-bottom: 15px; font-family: monospace;">
-        <strong style="color: #00ffcc;">[AI INTEL]:</strong>
-        <span th:text="${aiHint}" style="color: #e0e0e0; white-space: pre-wrap;">AI is typing...</span>
+    <div class="panel">
+        <h3>Available Targets</h3>
+
+        <div class="status-line">
+            &gt; Live challenge feed synchronized. Select a target and submit proof of compromise.
+        </div>
+
+        <div class="challenge-grid" th:if="${!#lists.isEmpty(challenges)}">
+            <div class="challenge-card"
+                 th:each="challenge : ${challenges}"
+                 th:classappend="${#lists.contains(solvedChallengeIds, challenge.id)} ? 'solved'">
+
+                <div class="challenge-title" th:text="${challenge.title}">Challenge Title</div>
+
+                <div class="challenge-meta">
+                    <span class="badge" th:text="${challenge.category}">Category</span>
+                    <span class="badge">
+                        <span th:text="${challenge.points}">0</span> pts
+                    </span>
+                    <span class="badge solved-badge"
+                          th:if="${#lists.contains(solvedChallengeIds, challenge.id)}">
+                        Solved
+                    </span>
+                </div>
+
+                <div class="challenge-description" th:text="${challenge.description}">
+                    Challenge description goes here.
+                </div>
+
+                <a class="file-link"
+                   th:if="${challenge.fileName != null}"
+                   th:href="@{/challenge/download/{id}(id=${challenge.id})}">
+                    [ DOWNLOAD TARGET FILE ]
+                </a>
+
+                <form th:if="${!#lists.contains(solvedChallengeIds, challenge.id)}"
+                      th:action="@{/challenge/submit}" method="post">
+                    <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+
+                    <label>Submit Flag:</label>
+                    <input type="text" name="flag" required placeholder="CRUD{...}" />
+
+                    <button type="submit">Transmit Flag</button>
+                </form>
+
+                <button th:if="${#lists.contains(solvedChallengeIds, challenge.id)}" disabled>
+                    Target Breached
+                </button>
+            </div>
+        </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(challenges)}">
+            No active targets detected.
+        </div>
     </div>
 
-    <div th:if="${#lists.contains(solvedChallengeIds, challenge.id)}" style="color: limegreen; font-weight: bold;">
-        [✓] FLAG SECURED
-    </div>
-
-    <div th:unless="${#lists.contains(solvedChallengeIds, challenge.id)}">
-
-        <form th:action="@{/player/submit}" method="post" style="margin-bottom: 10px;">
-            <input type="hidden" name="challengeId" th:value="${challenge.id}" />
-            <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
-            <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
-        </form>
-
-        <form th:action="@{/player/ask-ai}" method="post">
-            <input type="hidden" name="challengeId" th:value="${challenge.id}" />
-            <button type="submit" style="background-color: #001a33; color: #00ffcc; border: 1px solid #00ffcc; padding: 5px 10px; cursor: pointer; font-family: monospace;">
-                🧠 Query AI Database
-            </button>
-        </form>
-
+    <div class="footer-warning">
+        WARNING: ALL PLAYER OPERATIONS ARE MONITORED BY CRUD CTF INFRASTRUCTURE.<br>
+        FLAG SUBMISSIONS ARE LOGGED, VERIFIED, AND ARCHIVED.
     </div>
 </div>
+
 </body>
 </html>

@@ -1,28 +1,272 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>CRUD CTF - Global Leaderboard</title>
+  <title>CRUD CTF - Leaderboard</title>
+  <style>
+    body {
+      background-color: #050000;
+      color: #ff4d4d;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 40px;
+      margin: 0;
+      background-image: repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(255, 0, 0, 0.03) 2px,
+              rgba(255, 0, 0, 0.03) 4px
+      );
+    }
+
+    .terminal-container {
+      max-width: 950px;
+      margin: 0 auto;
+      border: 1px solid #cc0000;
+      box-shadow: 0 0 25px rgba(204, 0, 0, 0.25), inset 0 0 18px rgba(204, 0, 0, 0.12);
+      background-color: rgba(10, 0, 0, 0.92);
+      padding: 30px 40px;
+      position: relative;
+    }
+
+    .terminal-container::before {
+      content: "SCOREBOARD.UPLINK // LIVE RANKING FEED";
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background-color: #050000;
+      color: #ff0000;
+      padding: 0 10px;
+      font-size: 0.8em;
+      letter-spacing: 2px;
+      border-left: 1px solid #cc0000;
+      border-right: 1px solid #cc0000;
+    }
+
+    h2 {
+      color: #ff0000;
+      text-shadow: 0 0 8px #ff0000, 0 0 15px #aa0000;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      border-bottom: 2px solid #330000;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+
+    h3 {
+      color: #ff3333;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 30px;
+      border-left: 3px solid #ff0000;
+      padding-left: 10px;
+    }
+
+    .nav-links {
+      margin-bottom: 25px;
+      font-weight: bold;
+    }
+
+    a {
+      color: #ff6666;
+      text-decoration: none;
+      padding: 5px 10px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    a:hover {
+      color: #ffffff;
+      background-color: #aa0000;
+      border: 1px solid #ff0000;
+      box-shadow: 0 0 10px #ff0000;
+    }
+
+    .leaderboard-panel {
+      margin-top: 25px;
+      border: 1px solid #660000;
+      background-color: rgba(20, 0, 0, 0.75);
+      box-shadow: inset 0 0 12px rgba(255, 0, 0, 0.08);
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: rgba(5, 0, 0, 0.75);
+      overflow: hidden;
+    }
+
+    thead {
+      background-color: rgba(120, 0, 0, 0.4);
+      border-bottom: 1px solid #990000;
+    }
+
+    th {
+      color: #ff0000;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: left;
+      padding: 14px 12px;
+      font-size: 0.9em;
+      text-shadow: 0 0 6px rgba(255, 0, 0, 0.65);
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #330000;
+      color: #ff9999;
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background-color: rgba(120, 0, 0, 0.28);
+      box-shadow: inset 0 0 12px rgba(255, 0, 0, 0.12);
+    }
+
+    .rank {
+      color: #ff0000;
+      font-weight: bold;
+      text-shadow: 0 0 6px rgba(255, 0, 0, 0.7);
+      width: 90px;
+    }
+
+    .team-name {
+      color: #ffcccc;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score {
+      color: #ffffff;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255, 0, 0, 0.75);
+      text-align: right;
+    }
+
+    .top-rank {
+      background-color: rgba(255, 0, 0, 0.12);
+    }
+
+    .top-rank .rank,
+    .top-rank .team-name,
+    .top-rank .score {
+      color: #ffffff;
+      text-shadow: 0 0 10px #ff0000, 0 0 18px #aa0000;
+    }
+
+    .status-line {
+      color: #990000;
+      font-size: 0.9em;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      color: #990000;
+      border: 1px dashed #660000;
+      padding: 18px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background-color: rgba(10, 0, 0, 0.65);
+    }
+
+    .footer-warning {
+      margin-top: 40px;
+      padding-top: 15px;
+      border-top: 1px dashed #660000;
+      color: #990000;
+      font-size: 0.85em;
+      text-align: center;
+    }
+
+    .cursor {
+      animation: blink 1s step-end infinite;
+      color: #ff0000;
+    }
+
+    @keyframes blink {
+      0%, 100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 20px;
+      }
+
+      .terminal-container {
+        padding: 25px 20px;
+      }
+
+      th,
+      td {
+        padding: 12px 8px;
+        font-size: 0.9em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+      }
+    }
+  </style>
 </head>
 <body>
-<h2>Global Leaderboard</h2>
-<a th:href="@{/login}">[ Return to Login ]</a>
-<hr>
 
-<table border="1" style="width: 50%; text-align: left;">
-  <thead>
-  <tr>
-    <th>Rank</th>
-    <th>Team Name</th>
-    <th>Total Points</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="entry, iterStat : ${scoreboard}">
-    <td th:text="${iterStat.count}">1</td>
-    <td th:text="${entry.key}" style="font-weight: bold;">Team Name</td>
-    <td th:text="${entry.value}">0</td>
-  </tr>
-  </tbody>
-</table>
+<div class="terminal-container">
+  <h2>Global Leaderboard <span class="cursor">_</span></h2>
+
+  <div class="nav-links">
+    <a th:href="@{/login}">[ LOGIN ]</a>
+    <span style="color: #660000;">//</span>
+    <a th:href="@{/about}">[ SYSTEM DOSSIER ]</a>
+  </div>
+
+  <div class="leaderboard-panel">
+    <h3>Active Operator Rankings</h3>
+
+    <div class="status-line">
+      &gt; Ranking feed synchronized. Displaying highest confirmed scores.
+    </div>
+
+    <table th:if="${!#lists.isEmpty(scoreboard)}">
+      <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Operator / Team</th>
+        <th style="text-align: right;">Score</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="entry, iterStat : ${scoreboard}"
+          th:classappend="${iterStat.index == 0} ? 'top-rank'">
+        <td class="rank" th:text="'#' + ${iterStat.count}">#1</td>
+        <td class="team-name" th:text="${entry.key}">Team Name</td>
+        <td class="score" th:text="${entry.value} + ' pts'">0 pts</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(scoreboard)}">
+      No ranked operators detected.
+    </div>
+  </div>
+
+  <div class="footer-warning">
+    WARNING: SCOREBOARD DATA IS MONITORED BY CRUD CTF INFRASTRUCTURE.<br>
+    UNAUTHORIZED SCORE MANIPULATION WILL BE LOGGED, TRACED, AND TERMINATED.
+  </div>
+</div>
+
 </body>
 </html>
