@@ -258,6 +258,44 @@
             transform: none;
         }
 
+        .ai-form {
+            margin-top: 12px;
+            border-top: 1px dashed #550000;
+            padding-top: 12px;
+        }
+
+        .ai-button {
+            background-color: #220000;
+            border-color: #ff3333;
+            color: #ffcccc;
+        }
+
+        .ai-button:hover {
+            background-color: #990000;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.85);
+        }
+
+        .ai-response {
+            margin-top: 14px;
+            padding: 14px;
+            border: 1px solid #990000;
+            background-color: rgba(40, 0, 0, 0.85);
+            color: #ffcccc;
+            line-height: 1.6;
+            box-shadow: inset 0 0 12px rgba(255, 0, 0, 0.12), 0 0 12px rgba(255, 0, 0, 0.18);
+            white-space: pre-wrap;
+        }
+
+        .ai-response-title {
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
         .empty-state {
             color: #990000;
             border: 1px dashed #660000;
@@ -352,11 +390,26 @@
                     Challenge description goes here.
                 </div>
 
-                <a class="file-link"
-                   th:if="${challenge.fileName != null}"
-                   th:href="@{/player/download/{id}(id=${challenge.id})}">
-                    [ DOWNLOAD TARGET FILE ]
-                </a>
+                < <a class="file-link"
+                     th:if="${challenge.fileName != null}"
+                     th:href="@{/player/download/{id}(id=${challenge.id})}">
+                [ DOWNLOAD TARGET FILE ]
+            </a>
+
+                <form class="ai-form"
+                      th:action="@{/player/ask-ai}"
+                      method="post">
+                    <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+                    <button class="ai-button" type="submit">Ask AI Operative</button>
+                </form>
+
+                <div class="ai-response"
+                     th:if="${aiHint != null and aiHintChallengeId == challenge.id}">
+                    <div class="ai-response-title">AI Operative Response</div>
+                    <div th:text="${aiHint}">
+                        AI response appears here.
+                    </div>
+                </div>
 
                 <form th:if="${!#lists.contains(solvedChallengeIds, challenge.id)}"
                       th:action="@{/player/submit}" method="post">
