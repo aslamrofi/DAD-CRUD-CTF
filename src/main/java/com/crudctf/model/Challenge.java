@@ -16,6 +16,7 @@ public class Challenge {
     private String flag;
     private int points;
 
+
     // TODO for Wan Afiq: Add standard Getters and Setters below so Spring can access these fields
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -29,4 +30,38 @@ public class Challenge {
     public void setFlag(String flag) { this.flag = flag; }
     public int getPoints() { return points; }
     public void setPoints(int points) { this.points = points; }
+
+    // ... your existing fields like title, description, points ...
+
+    private String fileName;
+    private String fileType;
+
+    @Lob
+    private byte[] fileData;
+
+    // --- THESE EXACT GETTERS AND SETTERS MUST BE AT THE BOTTOM ---
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
+    }
 }
