@@ -16,9 +16,9 @@ import java.util.Map;
 public class OpenAiService {
 
     // This grabs the CRUD_OPENAI_API key you set in Railway (or application.properties)
-    @Value("${openai.api.key}")
+    // The text after the colon is a safe dummy fallback that stops the boot crash
+    @Value("${CRUD_OPENAI_API:OFFLINE_MODE}")
     private String apiKey;
-
     public String generateHint(String challengeTitle, String description) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://api.openai.com/v1/chat/completions";
