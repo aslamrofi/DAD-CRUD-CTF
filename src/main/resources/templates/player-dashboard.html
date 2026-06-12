@@ -19,9 +19,9 @@
 <h3>Active Targets</h3>
 
 <div th:each="challenge : ${challenges}"
-     th:style="${solvedChallengeIds.contains(challenge.id)} ?
-                   'border: 2px solid limegreen; background-color: #f0fff0; margin-bottom: 15px; padding: 15px; max-width: 600px;' :
-                   'border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;'">
+     th:style="${#lists.contains(solvedChallengeIds, challenge.id)} ?
+                       'border: 2px solid limegreen; background-color: #f0fff0; margin-bottom: 15px; padding: 15px; max-width: 600px;' :
+                       'border: 1px solid #333; margin-bottom: 15px; padding: 15px; max-width: 600px;'">
 
     <h4 style="margin-top: 0;">
         <span th:text="${challenge.title}">Challenge Title</span>
@@ -39,17 +39,31 @@
         </a>
     </div>
 
-    <div th:if="${aiHintChallengeId == challenge.id}" style="background-color: #1a1a1a; border-left: 4px solid #00ffcc; padding: 15px; margin-bottom: 15px; font-family: monospace;">
+    <div th:if="${aiHintChallengeId != null and aiHintChallengeId == challenge.id}" style="background-color: #1a1a1a; border-left: 4px solid #00ffcc; padding: 15px; margin-bottom: 15px; font-family: monospace;">
         <strong style="color: #00ffcc;">[AI INTEL]:</strong>
         <span th:text="${aiHint}" style="color: #e0e0e0; white-space: pre-wrap;">AI is typing...</span>
     </div>
 
-    <form th:unless="${solvedChallengeIds.contains(challenge.id)}" th:action="@{/player/ask-ai}" method="post" style="margin-bottom: 10px;">
-        <input type="hidden" name="challengeId" th:value="${challenge.id}" />
-        <button type="submit" style="background-color: #001a33; color: #00ffcc; border: 1px solid #00ffcc; padding: 5px 10px; cursor: pointer; font-family: monospace;">
-            🧠 Query AI Database
-        </button>
-    </form>
+    <div th:if="${#lists.contains(solvedChallengeIds, challenge.id)}" style="color: limegreen; font-weight: bold;">
+        [✓] FLAG SECURED
+    </div>
+
+    <div th:unless="${#lists.contains(solvedChallengeIds, challenge.id)}">
+
+        <form th:action="@{/player/submit}" method="post" style="margin-bottom: 10px;">
+            <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+            <input type="text" name="flag" placeholder="CRUD{...}" required style="width: 70%; padding: 5px;" />
+            <button type="submit" style="padding: 5px 10px;">Submit Flag</button>
+        </form>
+
+        <form th:action="@{/player/ask-ai}" method="post">
+            <input type="hidden" name="challengeId" th:value="${challenge.id}" />
+            <button type="submit" style="background-color: #001a33; color: #00ffcc; border: 1px solid #00ffcc; padding: 5px 10px; cursor: pointer; font-family: monospace;">
+                🧠 Query AI Database
+            </button>
+        </form>
+
+    </div>
 </div>
 </body>
 </html>
