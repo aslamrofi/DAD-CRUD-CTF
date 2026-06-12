@@ -5,7 +5,10 @@
 </head>
 <body>
 <h2>Welcome, <span th:text="${teamName}">Team</span></h2>
+
+<a th:href="@{/leaderboard}">[ Global Leaderboard ]</a> |
 <a th:href="@{/logout}">[ Disconnect ]</a>
+
 <hr>
 
 <div th:if="${successMsg}" th:text="${successMsg}" style="color: limegreen; font-weight: bold; margin-bottom: 15px;"></div>
